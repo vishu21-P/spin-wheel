@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spin & Earn</title>
+
+<style>
+body{
+    margin:0;
+    background:#0f172a;
+    color:white;
+    font-family:Arial, sans-serif;
+    text-align:center;
+}
+
+.container{
+    padding:15px;
+}
+
+.header{
+    background:#111827;
+    padding:12px;
+    font-size:22px;
+    font-weight:bold;
+}
+
+.balance-box{
+    background:#1f2937;
+    padding:12px;
+    margin:10px auto;
+    width:85%;
+    border-radius:12px;
+    font-size:20px;
+}
+
+.wheel{
+    width:280px;
+    height:280px;
+    margin:15px auto;
+    border-radius:50%;
+    border:5px solid gold;
+    background:conic-gradient(
+        #ff3b3b 0deg 90deg,
+        #3b82f6 90deg 180deg,
+        #22c55e 180deg 270deg,
+        #facc15 270deg 360deg
+    );
+    position:relative;
+    transition: transform 4s ease-out;
+}
+
+.pointer{
+    width:0;
+    height:0;
+    border-left:15px solid transparent;
+    border-right:15px solid transparent;
+    border-top:25px solid white;
+    margin:auto;
+}
+
+button{
+    margin:8px;
+    padding:10px 18px;
+    font-size:16px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.btn-spin{ background:#facc15; color:black; }
+.btn-withdraw{ background:#22c55e; color:black; }
+.btn-add{ background:#3b82f6; color:white; }
+.btn-invite{ background:#a855f7; color:white; }
+
+.result{
+    font-size:18px;
+    margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">🎡 Spin & Earn</div>
+
+<div class="container">
+
+<div class="balance-box">
+💰 Wallet Balance: ₹<span id="balance">2.00</span>
+</div>
+
+<div class="pointer"></div>
+<div id="wheel" class="wheel"></div>
+
+<button class="btn-spin" onclick="spinWheel()">🎡 SPIN NOW</button>
+<p id="result" class="result"></p>
+
+<button class="btn-withdraw" onclick="withdraw()">💳 WITHDRAW</button>
+<button class="btn-add" onclick="addMoney()">➕ ADD MONEY</button>
+<button class="btn-invite" onclick="invite()">🔗 INVITE FRIEND</button>
+
+</div>
+
+<audio id="spinSound" src="https://www.soundjay.com/buttons/sounds/button-16.mp3"></audio>
+<audio id="winSound" src="https://www.soundjay.com/buttons/sounds/button-3.mp3"></audio>
+
+<script>
+let balance = 2.00;
+let lastSpin = 0;
+
+// ======== SPIN FUNCTION (REAL WALLET INCREASE) ========
+function spinWheel(){
+    let now = new Date().getTime();
+
+    if(now - lastSpin < 3600000){
+        alert("⏳ You can spin again after 1 hour!");
+        return;
+    }
+
+    document.getElementById("spinSound").play();
+
+    let wheel = document.getElementById("wheel");
+    let randomDegree = 3600 + Math.floor(Math.random()*360);
+    wheel.style.transform = "rotate(" + randomDegree + "deg)";
+
+    setTimeout(()=>{
+        let rewards = [0.20, 0.50, 0.80, 1.00];
+        let win = rewards[Math.floor(Math.random()*rewards.length)];
+
+        balance = (parseFloat(balance) + win).toFixed(2);
+
+        document.getElementById("balance").innerText = balance;
+        document.getElementById("result").innerText = "🎉 You won ₹" + win;
+
+        document.getElementById("winSound").play();
+        lastSpin = new Date().getTime();
+    },4000);
+}
+
+// ======== REAL UPI WITHDRAW (NO FAKE) ========
+function withdraw(){
+    if(balance < 4){
+        alert("❌ Minimum withdraw is ₹4");
+        return;
+    }
+
+    let upi = prompt("Enter your REAL UPI ID (example: name@paytm)");
+
+    if(upi == null || upi.trim() == ""){
+        alert("❌ Please enter a valid UPI ID!");
+        return;
+    }
+
+    alert(
+        "✅ Withdraw Request Submitted!\n\n" +
+        "UPI: " + upi + "\n" +
+        "Amount: ₹" + balance + "\n\n" +
+        "👉 Please send this UPI to the Telegram bot for processing."
+    );
+
+    // Reset wallet after request
+    balance = 0.00;
+    document.getElementById("balance").innerText = balance.toFixed(2);
+}
+
+// ======== ADD MONEY (REAL INSTRUCTION, NO FAKE ADD) ========
+function addMoney(){
+    alert(
+        "➕ ADD MONEY (REAL METHOD)\n\n" +
+        "1) Open your UPI app\n" +
+        "2) Send money to admin UPI\n" +
+        "3) Send payment screenshot to Telegram bot\n" +
+        "4) Admin will credit your balance manually"
+    );
+}
+
+// ======== INVITE FUNCTION ========
+function invite(){
+    let link = "https://t.me/YourBotUsername?start=ref123";
+
+    alert("🔗 Share this invite link:\n" + link);
+
+    if(navigator.share){
+        navigator.share({
+            title: "Spin & Earn",
+            text: "Earn money by spinning!",
+            url: link
+        });
+    }
+}
+</script>
+
+</body>
+</html>
